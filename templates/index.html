@@ -1,11 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Messages {% endblock %}</h1>
-    {% for message in messages %}
-        <div class='message'>
-            <h3>{{ message['title'] }}</h3>
-            <p>{{ message['content'] }}</p>
+
+  <div id="image_parent">
+    <div id="image_child">
+        <h1>{% block title %} Images {% endblock %}</h1>
+    {% for image in images %}
+        <div class='image_field'>
+            <h3>{{ image['title'] }}</h3>
+            <p>{{ image['content'] }}</p>
+            <div id="image_frame">
+                <img src="static/images/{{ image['url'] }}">
+            </div>
         </div>
     {% endfor %}
+    </div>
+  </div>
+
 {% endblock %}

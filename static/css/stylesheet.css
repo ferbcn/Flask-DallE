@@ -10,7 +10,7 @@ a:hover {
   color: blue;
 }
 
-.message {
+.image_field {
     padding: 10px;
     margin: 5px;
     background-color: #f3f3f3
@@ -27,4 +27,45 @@ nav a {
     margin: 5px;
     color: #970020;
     background-color: #ffd5de;
+}
+
+#form_parent{
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   position: relative;
+   width: 90%;
+   height: 90%;
+}
+
+#form_child{
+   margin-top: 10vh;
+   position: relative;
+}
+
+#image_parent{
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   position: relative;
+   width: 90%;
+   height: 90%;
+}
+
+#image_child{
+   padding-left: 7.5vw;
+   position: relative;
+   align-items: center;
+}
+
+img{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 90%;
+    height: auto;
+}
+
+#image_frame{
+    align-items: right;
 }

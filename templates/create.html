@@ -1,23 +1,35 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %} Add a New Message {% endblock %}</h1>
-    <form method="post">
-        <label for="title">Title</label>
-        <br>
-        <input type="text" name="title"
-               placeholder="Message title"
-               value="{{ request.form['title'] }}"></input>
-        <br>
 
-        <label for="content">Message Content</label>
-        <br>
-        <textarea name="content"
-                  placeholder="Message content"
-                  rows="15"
-                  cols="60"
-                  >{{ request.form['content'] }}</textarea>
-        <br>
-        <button type="submit">Submit</button>
-    </form>
+<div class="container">
+  <div id="form_parent">
+    <div id="form_child">
+        <h1>{% block title %} Add a New Message {% endblock %}</h1>
+        <form method="post">
+            <label for="title">Title</label>
+            <br>
+            <input type="text" name="title"
+                   placeholder="Message title"
+                   value="{{ request.form['title'] }}"></input>
+            <br>
+
+            <label for="content">Message Content</label>
+            <br>
+            <textarea name="content"
+                      placeholder="Message content"
+                      rows="15"
+                      cols="60"
+                      >{{ request.form['content'] }}</textarea>
+            <br>
+            <input type="text" name="url"
+                   placeholder="URL"
+                   value="{{ request.form['url'] }}"></input>
+            <br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
