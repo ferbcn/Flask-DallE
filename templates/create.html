@@ -9,20 +9,21 @@
         <form method="post">
             <label for="title">Title</label>
             <br>
-            <input type="text" name="title"
+            <input id="form_field" type="text" name="title"
                    placeholder="Message title"
                    value="{{ request.form['title'] }}"></input>
             <br>
 
             <label for="content">Message Content</label>
             <br>
-            <textarea name="content"
-                      placeholder="Message content"
-                      rows="15"
-                      cols="60"
-                      >{{ request.form['content'] }}</textarea>
+            <input id="form_field" type="text" name="content"
+                   placeholder="Description"
+                   value="{{ request.form['content'] }}"></input>
             <br>
-            <input type="text" name="url"
+
+            <label for="url">URL</label>
+            <br>
+            <input id="form_field" type="text" name="url"
                    placeholder="URL"
                    value="{{ request.form['url'] }}"></input>
             <br>
