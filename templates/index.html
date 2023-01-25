@@ -10,7 +10,7 @@
             <h3>{{ image['title'] }}</h3>
             <p>{{ image['content'] }}</p>
             <div id="image_frame">
-                <img src="static/images/{{ image['url'] }}">
+                <img src="{{ image['url'] }}">
             </div>
         </div>
     {% endfor %}
