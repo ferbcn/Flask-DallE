@@ -6,7 +6,7 @@ import os
 openai.api_key = os.getenv("OPENAI_KEY")
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'fb432487413e7ef019fe2000b2fe94277565b7218be4e100'
+app.config['SECRET_KEY'] = os.gentenv("SECRET_KEY")
 
 images = [{'title': 'Lasting Rainbow',
          'content': 'Hello World',
