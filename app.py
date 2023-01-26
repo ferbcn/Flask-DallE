@@ -21,6 +21,7 @@ images = [{'title': 'Lasting Rainbow',
 
 @app.route('/')
 def index():
+    print(images)
     return render_template('index.html', images=list(reversed(images)))
 
 
