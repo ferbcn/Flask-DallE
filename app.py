@@ -5,10 +5,12 @@ import base64
 import openai
 
 # Flask
-from flask import Flask, render_template, request, flash, redirect, url_for, send_file # Converst bytes into a file for downloads
+from flask import Flask, render_template, request, flash, redirect, url_for, send_file
 
 # Flask SQLAlchemy, Database
 from flask_sqlalchemy import SQLAlchemy
+
+openai.api_key = os.getenv("OPENAI_KEY")
 
 basedir = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data.sqlite')
 
