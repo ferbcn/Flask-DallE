@@ -45,7 +45,7 @@ def render_picture(data):
 @app.route('/index', methods=['GET', 'POST'])
 @app.route('/')
 def index():
-    #db.create_all()
+    db.create_all()
 
     # read last 10 images from db
     images = FileContent.query.limit(10).all()
