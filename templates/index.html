@@ -7,9 +7,9 @@
         {% for image in images %}
             <div class='image_field'>
                 <h3>{{ image['title'] }}</h3>
-                <p>{{ image['content'] }}</p>
-                <div id="image_frame">
-                    <img src="static/images/{{ image['url'] }}">
+                <img src="data:;base64,{{ image['rendered_data'] }}"/>
+                <div class="del_but">
+                    <a href={{url_for('delete')}}?img_id={{image['id']}}>Delete</a>
                 </div>
             </div>
         {% endfor %}
