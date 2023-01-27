@@ -5,6 +5,7 @@ import base64
 import openai
 
 # Flask
+import requests
 from flask import Flask, render_template, request, flash, redirect, url_for, send_file
 
 # Flask SQLAlchemy, Database
@@ -95,7 +96,14 @@ def create():
             flash('Content is required!')
         else:
             url = get_image_url(content)
-            # TODO: Add image or url to DB
+
+            response = requests.get(url, stream=True)
+            data = response.content
+            render_file = render_picture(data)
+            new_file = FileContent(title=title, data=data, rendered_data=render_file)
+            db.session.add(new_file)
+            db.session.commit()
+
             return redirect(url_for('index'))
 
     return render_template('create.html')
