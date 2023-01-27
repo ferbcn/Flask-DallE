@@ -38,6 +38,11 @@ class FileContent(db.Model):
         return f'Pic Name: {self.name} Data: {self.data} text: {self.text} created on: {self.pic_date} location: {self.location}'
 
 
+def render_picture(data):
+    render_pic = base64.b64encode(data).decode('ascii')
+    return render_pic
+
+
 # Index It routes to index.html where the upload forms is
 @app.route('/index', methods=['GET', 'POST'])
 @app.route('/')
@@ -46,27 +51,28 @@ def index():
     return render_template('index.html')
 
 
-def render_picture(data):
-    render_pic = base64.b64encode(data).decode('ascii')
-    return render_pic
+@app.route('/create', methods=['GET', 'POST'])
+def create():
+    if request.method == 'POST':
+        title = request.form['title']
+        file = request.files['inputFile']
+        if not title:
+            flash('Title is required!')
+        elif not file:
+            flash('Image is required!')
+        else:
+            data = file.read()
+            render_file = render_picture(data)
+            newFile = FileContent(name=file.filename, data=data,
+                                  rendered_data=render_file, text=title)
+            db.session.add(newFile)
+            db.session.commit()
+            flash(f'Pic {newFile.name} uploaded Text: {newFile.text} Location: {newFile.location}')
+
+            return redirect(url_for('index'))
 
 
-@app.route('/upload', methods=['POST'])
-def upload():
-    file = request.files['inputFile']
-    data = file.read()
-    render_file = render_picture(data)
-    text = request.form['text']
-    location = request.form['location']
-
-    newFile = FileContent(name=file.filename, data=data,
-    rendered_data=render_file, text=text, location=location)
-    db.session.add(newFile)
-    db.session.commit()
-    flash(f'Pic {newFile.name} uploaded Text: {newFile.text} Location: {newFile.location}')
-
-    return render_template('index.html')
-
+    return render_template('create.html')
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
