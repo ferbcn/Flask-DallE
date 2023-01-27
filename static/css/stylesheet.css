@@ -7,7 +7,7 @@ a {
 }
 
 a:hover {
-  color: blue;
+  color: red;
 }
 
 .image_field {
@@ -27,6 +27,10 @@ nav a {
     margin: 5px;
     color: #970020;
     background-color: #ffd5de;
+}
+
+.del_but {
+    text-align: center;
 }
 
 #form_parent{
