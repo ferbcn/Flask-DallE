@@ -49,9 +49,6 @@ def index():
 
     # read last 10 images from db
     images = FileContent.query.limit(10).all()
-    for image in images:
-        print(image)
-
     return render_template('index.html', images=list(reversed(images)))
 
 
@@ -61,9 +58,9 @@ def upload():
         title = request.form['title']
         file = request.files['inputFile']
         if not title:
-            flash('Title is required!')
+            flash('Title is required!', 'error')
         elif not file:
-            flash('Image is required!')
+            flash('Image is required!', 'error')
         else:
             data = file.read()
             render_file = render_picture(data)
@@ -81,7 +78,7 @@ def delete():
     img_id = request.args['img_id']
     FileContent.query.filter_by(id=img_id).delete()
     db.session.commit()
-    flash(f"Image with id = {img_id} deleted!")
+    flash(f"Image with id = {img_id} deleted!", 'warning')
     return redirect(url_for('index'))
 
 
