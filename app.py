@@ -25,17 +25,15 @@ class FileContent(db.Model):
     The first time the app runs you need to create the table. In Python
     terminal import db, Then run db.create_all()
     """
-    """ ___tablename__ = 'yourchoice' """ # You can override the default table name
+    """ ___tablename__ = 'yourchoice' """   # You can override the default table name
 
     id = db.Column(db.Integer,  primary_key=True)
-    name = db.Column(db.String(128), nullable=False)
+    title = db.Column(db.Text)
     data = db.Column(db.LargeBinary, nullable=False) #Actual data, needed for Download
     rendered_data = db.Column(db.Text, nullable=False)#Data to render the pic in browser
-    text = db.Column(db.Text)
-    location = db.Column(db.String(64))
     pic_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     def __repr__(self):
-        return f'Pic Name: {self.name} Data: {self.data} text: {self.text} created on: {self.pic_date} location: {self.location}'
+        return f'Pic Name: {self.title}, created on: {self.pic_date}'
 
 
 def render_picture(data):
@@ -48,6 +46,13 @@ def render_picture(data):
 @app.route('/')
 def index():
     #db.create_all()
+
+    # TODO: Read images from DB and pass to template
+    images = FileContent.query.all()
+    for image in images:
+        print(image)
+
+    flash(images)
     return render_template('index.html')
 
 
@@ -63,11 +68,10 @@ def create():
         else:
             data = file.read()
             render_file = render_picture(data)
-            newFile = FileContent(name=file.filename, data=data,
-                                  rendered_data=render_file, text=title)
+            newFile = FileContent(title=title, data=data,
+                                  rendered_data=render_file)
             db.session.add(newFile)
             db.session.commit()
-            flash(f'Pic {newFile.name} uploaded Text: {newFile.text} Location: {newFile.location}')
 
             return redirect(url_for('index'))
 
