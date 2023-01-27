@@ -51,7 +51,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/create', methods=['GET', 'POST'])
+@app.route('/upload/', methods=['GET', 'POST'])
 def create():
     if request.method == 'POST':
         title = request.form['title']
@@ -72,7 +72,7 @@ def create():
             return redirect(url_for('index'))
 
 
-    return render_template('create.html')
+    return render_template('upload.html')
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
