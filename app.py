@@ -29,8 +29,8 @@ class FileContent(db.Model):
 
     id = db.Column(db.Integer,  primary_key=True)
     title = db.Column(db.Text)
-    data = db.Column(db.LargeBinary, nullable=False) #Actual data, needed for Download
-    rendered_data = db.Column(db.Text, nullable=False)#Data to render the pic in browser
+    data = db.Column(db.LargeBinary, nullable=False)    # Actual data, needed for Download
+    rendered_data = db.Column(db.Text, nullable=False)  # Data to render the pic in browser
     pic_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     def __repr__(self):
         return f'Pic Name: {self.title}, created on: {self.pic_date}'
@@ -47,17 +47,16 @@ def render_picture(data):
 def index():
     #db.create_all()
 
-    # TODO: Read images from DB and pass to template
-    images = FileContent.query.all()
+    # read last 10 images from db
+    images = FileContent.query.limit(10).all()
     for image in images:
         print(image)
 
-    flash(images)
-    return render_template('index.html')
+    return render_template('index.html', images=list(reversed(images)))
 
 
 @app.route('/upload/', methods=['GET', 'POST'])
-def create():
+def upload():
     if request.method == 'POST':
         title = request.form['title']
         file = request.files['inputFile']
@@ -68,15 +67,25 @@ def create():
         else:
             data = file.read()
             render_file = render_picture(data)
-            newFile = FileContent(title=title, data=data,
-                                  rendered_data=render_file)
-            db.session.add(newFile)
+            new_file = FileContent(title=title, data=data, rendered_data=render_file)
+            db.session.add(new_file)
             db.session.commit()
-
+            # Return to index and show all images
             return redirect(url_for('index'))
 
-
     return render_template('upload.html')
+
+
+@app.route('/delete', methods=['GET'])
+def delete():
+    img_id = request.args['img_id']
+    FileContent.query.filter_by(id=img_id).delete()
+    db.session.commit()
+    flash(f"Image with id = {img_id} deleted!")
+    return redirect(url_for('index'))
+
+
+
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
