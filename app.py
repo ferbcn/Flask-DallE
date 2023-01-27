@@ -1,53 +1,72 @@
-# app.py
-from flask import Flask, render_template, request, url_for, flash, redirect
-import openai
+# Built-in Imports
 import os
+from datetime import datetime
+from base64 import b64encode
+import base64
+from io import BytesIO #Converts data from Database into bytes
 
-openai.api_key = os.getenv("OPENAI_KEY")
+# Flask
+from flask import Flask, render_template, request, flash, redirect, url_for, send_file # Converst bytes into a file for downloads
 
+# Flask SQLAlchemy, Database
+from flask_sqlalchemy import SQLAlchemy
+
+basedir = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data.sqlite')
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
+app.config['SQLALCHEMY_DATABASE_URI'] = basedir
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'dev'
+db = SQLAlchemy(app)
+
+# Picture table. By default the table name is filecontent
+class FileContent(db.Model):
+    """
+    The first time the app runs you need to create the table. In Python
+    terminal import db, Then run db.create_all()
+    """
+    """ ___tablename__ = 'yourchoice' """ # You can override the default table name
+
+    id = db.Column(db.Integer,  primary_key=True)
+    name = db.Column(db.String(128), nullable=False)
+    data = db.Column(db.LargeBinary, nullable=False) #Actual data, needed for Download
+    rendered_data = db.Column(db.Text, nullable=False)#Data to render the pic in browser
+    text = db.Column(db.Text)
+    location = db.Column(db.String(64))
+    pic_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    def __repr__(self):
+        return f'Pic Name: {self.name} Data: {self.data} text: {self.text} created on: {self.pic_date} location: {self.location}'
 
 
-images = [{'title': 'Lasting Rainbow',
-         'content': 'Hello World',
-         'url': 'static/images/miro.jpg'},
-        {'title': 'Superb Firework',
-         'content': 'Hello Flask',
-         'url': 'static/images/rock.jpg'},
-        ]
-
-
+# Index It routes to index.html where the upload forms is
+@app.route('/index', methods=['GET', 'POST'])
 @app.route('/')
 def index():
-    print(images)
-    return render_template('index.html', images=list(reversed(images)))
+    #db.create_all()
+    return render_template('index.html')
 
 
-@app.route('/create/', methods=('GET', 'POST'))
-def create():
-    if request.method == 'POST':
-        title = request.form['title']
-        content = request.form['content']
-        url = get_image_url(content)
-
-        if not title:
-            flash('Title is required!')
-        elif not content:
-            flash('Content is required!')
-        else:
-            images.append({'title': title, 'content': content, 'url': url})
-            return redirect(url_for('index'))
-
-    return render_template('create.html')
+def render_picture(data):
+    render_pic = base64.b64encode(data).decode('ascii')
+    return render_pic
 
 
-def get_image_url(prompt):
-    """Get the image from the prompt."""
-    response = openai.Image.create(prompt=prompt, n=1, size="1024x1024")
-    image_url = response["data"][0]["url"]
-    return image_url
+@app.route('/upload', methods=['POST'])
+def upload():
+    file = request.files['inputFile']
+    data = file.read()
+    render_file = render_picture(data)
+    text = request.form['text']
+    location = request.form['location']
+
+    newFile = FileContent(name=file.filename, data=data,
+    rendered_data=render_file, text=text, location=location)
+    db.session.add(newFile)
+    db.session.commit()
+    flash(f'Pic {newFile.name} uploaded Text: {newFile.text} Location: {newFile.location}')
+
+    return render_template('index.html')
+
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
