@@ -1,9 +1,8 @@
 # Built-in Imports
 import os
 from datetime import datetime
-from base64 import b64encode
 import base64
-from io import BytesIO #Converts data from Database into bytes
+import openai
 
 # Flask
 from flask import Flask, render_template, request, flash, redirect, url_for, send_file # Converst bytes into a file for downloads
@@ -87,16 +86,24 @@ def create():
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
-        print(title, content)
+        url = get_image_url(content)
 
         if not title:
             flash('Title is required!')
         elif not content:
             flash('Content is required!')
         else:
+            images.append({'title': title, 'content': content, 'url': url})
             return redirect(url_for('index'))
 
     return render_template('create.html')
+
+
+def get_image_url(prompt):
+    """Get the image from the prompt."""
+    response = openai.Image.create(prompt=prompt, n=1, size="1024x1024")
+    image_url = response["data"][0]["url"]
+    return image_url
 
 
 if __name__ == '__main__':
