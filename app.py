@@ -82,6 +82,21 @@ def delete():
     return redirect(url_for('index'))
 
 
+@app.route('/create/', methods=('GET', 'POST'))
+def create():
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        print(title, content)
+
+        if not title:
+            flash('Title is required!')
+        elif not content:
+            flash('Content is required!')
+        else:
+            return redirect(url_for('index'))
+
+    return render_template('create.html')
 
 
 if __name__ == '__main__':
