@@ -93,7 +93,7 @@ def create():
         elif not content:
             flash('Content is required!')
         else:
-            images.append({'title': title, 'content': content, 'url': url})
+            # TODO: Add image or url to DB
             return redirect(url_for('index'))
 
     return render_template('create.html')
