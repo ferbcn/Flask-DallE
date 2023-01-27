@@ -1,9 +1,11 @@
 html, body {
     font-family: "Lucida Console", "Courier New", monospace;
+    background-color: black;
+    color: #d64161;
 }
 
 a {
-  color: purple;
+  color: white;
 }
 
 a:hover {
@@ -11,9 +13,10 @@ a:hover {
 }
 
 .image_field {
+    margin-top: 3vh;
     padding: 10px;
-    margin: 5px;
-    background-color: #f3f3f3
+    background-color: #black;
+    text-align: center;
 }
 nav a {
     color: #d64161;
