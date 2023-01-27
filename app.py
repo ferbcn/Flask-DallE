@@ -88,13 +88,13 @@ def create():
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
-        url = get_image_url(content)
 
         if not title:
             flash('Title is required!')
         elif not content:
             flash('Content is required!')
         else:
+            url = get_image_url(content)
             # TODO: Add image or url to DB
             return redirect(url_for('index'))
 
