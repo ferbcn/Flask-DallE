@@ -39,7 +39,6 @@ a {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2;
-    height: 50px;
     animation:alert-response 2s 1;
     -webkit-animation:alert-response 2s 1;
     animation-fill-mode: forwards;
