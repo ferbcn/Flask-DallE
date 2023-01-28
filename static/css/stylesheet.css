@@ -21,8 +21,8 @@ a:hover {
 
 nav a {
     color: #d64161;
-    font-size: 3em;
-    margin-left: 50px;
+    font-size: 3.5vw;
+    margin-left: 20px;
     text-decoration: none;
 }
 
@@ -35,6 +35,11 @@ nav a {
 
 .del_but {
     text-align: center;
+}
+
+.container{
+    margin-top: 5%;
+    width: 75%;
 }
 
 
