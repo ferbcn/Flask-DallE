@@ -8,10 +8,6 @@ a {
   color: white;
 }
 
-a:hover {
-  color: red;
-}
-
 .image_field {
     margin-top: 3vh;
     padding: 10px;
@@ -34,6 +30,7 @@ a:hover {
     margin: 5px;
     color: #970020;
     background-color: #ffd5de;
+    height: 60px;
 }
 
 .del_but {
@@ -47,7 +44,7 @@ a:hover {
 
 
 /* Style the submit button */
-input[type=submit], file{
+input[type=submit]{
   margin-top: 3vh;
   background-color: #d64161;
   color: white;
