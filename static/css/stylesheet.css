@@ -36,21 +36,6 @@ nav a {
     text-align: center;
 }
 
-#form_parent{
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   position: relative;
-   width: 90%;
-   height: 90%;
-}
-
-#form_child{
-   margin-top: 10vh;
-   position: relative;
-   width: 75%;
-
-}
 
 /* Style inputs, select elements and textareas */
 input[type=text], select, textarea{
