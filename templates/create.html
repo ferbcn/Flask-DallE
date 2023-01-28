@@ -9,14 +9,14 @@
         <form method="post">
             <label for="title">Title</label>
             <br>
-            <input class="form-control" id="form_field" type="text" name="title"
+            <input class="form-control" type="text" name="title"
                    placeholder="Image title"
                    value="{{ request.form['title'] }}"></input>
             <br>
 
             <label for="content">AI instructions</label>
             <br>
-            <input class="form-control" input id="form_field" type="text" name="content"
+            <input class="form-control" type="text" name="content"
                    placeholder="Image content decription"
                    value="{{ request.form['content'] }}"></input>
             <br>
