@@ -37,16 +37,6 @@ nav a {
 }
 
 
-/* Style inputs, select elements and textareas */
-input[type=text], select, textarea{
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  resize: vertical;
-}
-
 /* Style the submit button */
 input[type=submit], file{
   margin-top: 3vh;
@@ -70,7 +60,6 @@ input[type=submit], file{
 }
 
 #image_child{
-   padding-left: 7.5vw;
    position: relative;
    align-items: center;
 }
