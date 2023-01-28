@@ -10,13 +10,34 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}">
 </head>
+
 <body>
-    <nav>
-        <a href="{{ url_for('index') }}">Images</a>
-        <a href="{{ url_for('upload') }}">Upload</a>
-        <a href="{{ url_for('create') }}">Create</a>
-        <a href="#">About</a>
-    </nav>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="{{ url_for('index') }}">Images</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar-main">
+
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="{{ url_for('upload') }}">
+                        Upload
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <a class="nav-link" href="{{ url_for('create') }}">
+                    Create
+                </a>
+            </ul>
+            <ul class="navbar-nav">
+                <a class="nav-link" href="#">
+                    About
+                </a>
+            </ul>
+        </div>
+      </nav>
     <hr>
     <div class="content">
         {% for message in get_flashed_messages() %}
