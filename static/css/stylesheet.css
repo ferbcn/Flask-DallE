@@ -36,20 +36,13 @@ nav a {
     text-align: center;
 }
 
-#form_parent{
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   position: relative;
-   width: 90%;
-   height: 90%;
+/* Style the container */
+.container {
+  border-radius: 5px;
+  padding: 20px;
 }
 
-#form_child{
-   margin-top: 10vh;
-   position: relative;
-   width: 50%;
-}
+
 
 /* Style inputs, select elements and textareas */
 input[type=text], select, textarea{
