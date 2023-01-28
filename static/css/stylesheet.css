@@ -36,6 +36,11 @@ nav a {
     text-align: center;
 }
 
+.container{
+    margin-top: 5%;
+    width: 75%;
+}
+
 
 /* Style the submit button */
 input[type=submit], file{
