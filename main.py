@@ -58,13 +58,13 @@ def index():
 def upload():
     if request.method == 'POST':
         title = request.form['title']
-        file = request.files['inputFile']
+        inputFile = request.files['inputFile']
         if not title:
             flash('Title is required!', 'error')
-        elif not file:
+        elif not inputFile:
             flash('Image is required!', 'error')
         else:
-            data = file.read()
+            data = inputFile.read()
             render_file = render_picture(data)
             new_file = FileContent(title=title, data=data, rendered_data=render_file)
             db.session.add(new_file)
@@ -95,16 +95,18 @@ def create():
         elif not content:
             flash('Content is required!')
         else:
-            url = get_image_url(content)
+            try:
+                url = get_image_url(content)
+                response = requests.get(url, stream=True)
+                data = response.content
+                render_file = render_picture(data)
+                new_file = FileContent(title=title, data=data, rendered_data=render_file)
+                db.session.add(new_file)
+                db.session.commit()
+                return redirect(url_for('index'))
 
-            response = requests.get(url, stream=True)
-            data = response.content
-            render_file = render_picture(data)
-            new_file = FileContent(title=title, data=data, rendered_data=render_file)
-            db.session.add(new_file)
-            db.session.commit()
-
-            return redirect(url_for('index'))
+            except Exception as e:
+                flash('AI creation error! Please, try something else.')
 
     return render_template('create.html')
 
@@ -118,4 +120,4 @@ def get_image_url(prompt):
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
-    app.run(threaded=True, port=5000, debug=True)
+    app.run(host='0.0.0.0', threaded=True, port=80, debug=False)

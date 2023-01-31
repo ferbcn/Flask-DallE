@@ -21,10 +21,11 @@ a {
 }
 
 .nav-link {
-    padding: 2vw;
+    margin-left:2vw;
     color: #d64161;
 }
-.navbar-collapse{
+
+.navbar-collapse {
     margin-left:2vw;
 }
 
@@ -39,8 +40,8 @@ a {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2;
-    animation:alert-response 2s 1;
-    -webkit-animation:alert-response 2s 1;
+    animation:alert-response 4s 1;
+    -webkit-animation:alert-response 4s 1;
     animation-fill-mode: forwards;
 }
 
