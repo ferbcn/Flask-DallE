@@ -21,6 +21,16 @@
             <input type="submit" value="Submit">
         </form>
 
+        <br>
+        <div class="image_view">
+            {% if image %}
+                <div class='image_field'>
+                    <h3>{{ image['title'] }}</h3>
+                    <img src="{{ image['url'] }}"/>
+                </div>
+            {% endif %}
+        </div>
+
     </div>
   </div>
 </div>

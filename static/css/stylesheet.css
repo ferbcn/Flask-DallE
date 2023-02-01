@@ -29,6 +29,10 @@ a {
     margin-left:2vw;
 }
 
+.image_view{
+    margin-top: 15%;
+}
+
 .alert {
     padding: 10px;
     color: #970020;
@@ -64,7 +68,7 @@ a {
 
 /* Style the submit button */
 input[type=submit]{
-  margin-top: 3vh;
+  margin-top: 0vh;
   background-color: #d64161;
   color: white;
   padding: 12px 20px;

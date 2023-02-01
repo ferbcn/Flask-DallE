@@ -103,9 +103,12 @@ def create():
                 new_file = FileContent(title=title, data=data, rendered_data=render_file)
                 db.session.add(new_file)
                 db.session.commit()
-                return redirect(url_for('index'))
+                #return redirect(url_for('index'))
+                image = {"title": title, 'url': url}
+                return render_template('create.html', image=image)
 
             except Exception as e:
+                print(e)
                 flash('AI creation error! Please, try something else.')
 
     return render_template('create.html')
@@ -113,11 +116,11 @@ def create():
 
 def get_image_url(prompt):
     """Get the image from the prompt."""
-    response = openai.Image.create(prompt=prompt, n=1, size="1024x1024")
+    response = openai.Image.create(prompt=prompt, n=1, size="512x512")
     image_url = response["data"][0]["url"]
     return image_url
 
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
-    app.run(host='0.0.0.0', threaded=True, port=80, debug=False)
+    app.run(host='0.0.0.0', threaded=True, port=80, debug=True)
