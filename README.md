@@ -19,5 +19,5 @@ python
 wsgi-nginx
 Flask
 
-[www.art-intel.site](www.art-intel.site)
+[www.art-intel.site](http://www.art-intel.site)
 
