@@ -7,3 +7,4 @@ MarkupSafe
 Werkzeug
 flask_sqlalchemy
 openai
+psycopg2-binary

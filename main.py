@@ -16,13 +16,22 @@ openai.api_key = os.getenv("OPENAI_KEY")
 
 quote_url = 'https://zenquotes.io/api/quotes'
 
-basedir = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data.sqlite')
+#basedir = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data.sqlite')
+
+db_name = 'postgres'
+db_user = 'linpostgres'
+db_pass = os.environ.get('DB_PASSWORD')
+db_url = os.environ.get('DB_URL')
+
+basedir = f"postgresql://{db_user}:{db_pass}@{db_url}:5432/{db_name}"
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = basedir
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'dev'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 db = SQLAlchemy(app)
+
+# migrate = Migrate(app, db)
 
 # Picture table. By default the table name is filecontent
 class FileContent(db.Model):
