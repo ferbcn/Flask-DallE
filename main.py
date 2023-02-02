@@ -67,8 +67,8 @@ def index():
     return render_template('index.html', images=images)
 
 
-@app.route('/daily/', methods=['GET'])
-def daily():
+@app.route('/quote/', methods=['GET'])
+def quote():
     try:
         response = requests.get(quote_url)
         data_str = response.text
@@ -86,7 +86,7 @@ def daily():
             db.session.add(new_file)
             db.session.commit()
             image = {'url': url}
-            return render_template('daily.html', quote=quote_author, image=image)
+            return render_template('quote.html', quote=quote_author, image=image)
 
         except Exception as e:
             print(e)
@@ -100,7 +100,7 @@ def daily():
         flash('Quote retrieval error!')
 
 
-    return render_template('daily.html', quote=quote_author, image=image)
+    return render_template('quote.html', quote=quote_author, image=image)
 
 
 @app.route('/delete', methods=['GET'])
