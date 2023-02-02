@@ -67,8 +67,28 @@ def index():
     return render_template('index.html', images=images)
 
 
-@app.route('/quote/', methods=['GET'])
+@app.route('/quote/', methods=['GET', 'POST'])
 def quote():
+    if request.method == 'POST':
+        quote = request.form['quote']
+        author = request.form['author']
+        quote_author = {'quote': quote, 'author': author}
+        # Generate Image on Dall-E
+        try:
+            url = get_image_url(quote)
+            response = requests.get(url, stream=True)
+            data = response.content
+            render_file = render_picture(data)
+            # add file to db
+            new_file = FileContent(title=author, data=data, rendered_data=render_file)
+            db.session.add(new_file)
+            db.session.commit()
+            image = {'url': url}
+            return render_template('quote.html', quote=quote_author, image=image)
+        except Exception as e:
+            print(e)
+            flash('Image creation error!')
+
     try:
         response = requests.get(quote_url)
         data_str = response.text
@@ -77,30 +97,14 @@ def quote():
         author = data.get("a")
         quote_author = {'quote': quote, 'author': author}
 
-        try:
-            url = get_image_url(quote)
-            response = requests.get(url, stream=True)
-            data = response.content
-            render_file = render_picture(data)
-            new_file = FileContent(title='Quotes', data=data, rendered_data=render_file)
-            db.session.add(new_file)
-            db.session.commit()
-            image = {'url': url}
-            return render_template('quote.html', quote=quote_author, image=image)
-
-        except Exception as e:
-            print(e)
-            image = None
-            flash('Image creation error!')
-
     except Exception as e:
         print(e)
         quote_author = None
-        image = None
+
         flash('Quote retrieval error!')
 
 
-    return render_template('quote.html', quote=quote_author, image=image)
+    return render_template('quote.html', quote=quote_author)
 
 
 @app.route('/delete', methods=['GET'])

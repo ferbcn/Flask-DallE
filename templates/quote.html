@@ -9,8 +9,16 @@
 
         <br>
         <h3><i>{{ quote.quote }}</i></h3>
+        <i class="bi bi-arrow-clockwise"></i>
         <br>
         <h5>{{ quote.author }}</h5>
+
+        <br>
+        <form method="post" onSubmit="return handleClick()">
+            <input type="hidden" name="quote" value="{{ quote.quote }}">
+            <input type="hidden" name="author" value="{{ quote.author }}">
+            <input type="submit" value="Generate Image">
+        </form>
 
         <br>
         <div class="image_view">
