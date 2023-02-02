@@ -19,7 +19,7 @@ quote_url = 'https://zenquotes.io/api/quotes'
 #basedir = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data.sqlite')
 
 db_name = 'postgres'
-db_user = 'linpostgres'
+db_user = os.environ.get('DB_USER')
 db_pass = os.environ.get('DB_PASSWORD')
 db_url = os.environ.get('DB_URL')
 
