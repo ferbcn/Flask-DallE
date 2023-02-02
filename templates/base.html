@@ -45,6 +45,19 @@
                     About
                 </a>
             </ul>
+            {% if user_auth %}
+            <ul class="navbar-nav">
+                <a class="nav-link" href="{{ url_for('logout') }}">
+                    <i>Logout</i>
+                </a>
+            </ul>
+            {% else %}
+            <ul class="navbar-nav">
+                <a class="nav-link" href="{{ url_for('login') }}">
+                    <i>Login</i>
+                </a>
+            </ul>
+            {% endif %}
         </div>
       </nav>
 

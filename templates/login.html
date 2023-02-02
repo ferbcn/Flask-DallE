@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="container">
+  <div id="login_parent">
+    <div id="login_child">
+      <h2>Login</h2>
+      <br>
+      <br>
+      <form action="{{ url_for('login') }}" method="post">
+          Username:<input class="form-control" name="username" type="text" placeholder="username">
+          Password:<input class="form-control" name="password" type="password" placeholder="password">
+          <br>
+          <button class="btn btn-danger">Login</button>
+      </form>
+      <br>
+      Not registered yet? <a href="{{ url_for('register') }}">Register here</a>
+    </div>
+  </div>
+
+
+</div>
+
+
+{% endblock %}

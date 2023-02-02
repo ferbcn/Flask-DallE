@@ -8,3 +8,5 @@ Werkzeug
 flask_sqlalchemy
 openai
 psycopg2-binary
+flask_login
+flask_migrate
