@@ -141,4 +141,4 @@ def get_image_url(prompt):
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
-    app.run(host='0.0.0.0', threaded=True, port=80, debug=True)
+    app.run(host='0.0.0.0', threaded=True, port=80, debug=False)
