@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <div id="image_parent">
+    <div id="image_child">
+        <div class='image_field'>
+            <h4>
+                <p>Educational Website</p>
+                <p>for creating images with</p>
+            </h4>
+            <h3>
+                <p>Artificial Intelligence</p>
+            </h3>
+            <br>
+            {% if num_images %}
+            <h4>
+                Total images created:
+            </h4>
+            <h3>
+                {{ num_images }}
+            </h3>
+            {% endif %}
+        </div>
+    </div>
+  </div>
+
+{% endblock %}

@@ -141,6 +141,16 @@ def create():
     return render_template('create.html')
 
 
+@app.route('/about', methods=['GET'])
+def about():
+    try:
+        num_images = FileContent.query.count()
+    except Exception as e:
+        print (e)
+        num_images = None
+    return render_template('about.html', num_images=num_images)
+
+
 def get_image_url(prompt):
     """Get the image from the prompt."""
     response = openai.Image.create(prompt=prompt, n=1, size="512x512")
