@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %} {% endblock %}Image AI</title>
+    <title>{% block title %} {% endblock %} AI</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='/images/favicon.ico') }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
@@ -12,6 +12,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}">
+
+    <script type="text/javascript">
+    function handleClick() {
+        document.getElementById('spinner').style.visibility = 'visible';
+    }
+    </script>
+
 </head>
 
 <body>
@@ -23,8 +30,8 @@
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">
-                    <a class="nav-link" href="{{ url_for('upload') }}">
-                        Upload
+                    <a class="nav-link" href="{{ url_for('daily') }}">
+                        Daily
                     </a>
                 </li>
             </ul>
@@ -51,6 +58,11 @@
         {% block content %} {% endblock %}
     </div>
 
+    <div class="text-center">
+        <div class="spinner-border text-light" id="spinner" role="status">
+        <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 
 </body>
 </html>

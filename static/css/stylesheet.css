@@ -29,10 +29,6 @@ a {
     margin-left:2vw;
 }
 
-.image_view{
-    margin-top: 15%;
-}
-
 .alert {
     padding: 10px;
     color: #970020;
@@ -105,3 +101,12 @@ img{
     align-items: right;
 }
 
+.image_view{
+    margin-top: 10%;
+}
+
+.spinner-border {
+  visibility: hidden;
+  width: 5rem;
+  height: 5rem;
+}

@@ -1,4 +1,5 @@
 # Built-in Imports
+import json
 import os
 from datetime import datetime
 import base64
@@ -12,6 +13,8 @@ from flask import Flask, render_template, request, flash, redirect, url_for, sen
 from flask_sqlalchemy import SQLAlchemy
 
 openai.api_key = os.getenv("OPENAI_KEY")
+
+quote_url = 'https://zenquotes.io/api/quotes'
 
 basedir = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data.sqlite')
 
@@ -50,29 +53,45 @@ def index():
     db.create_all()
 
     # read last 10 images from db
-    images = FileContent.query.limit(10).all()
-    return render_template('index.html', images=list(reversed(images)))
+    #images = FileContent.query.limit(10).all()
+    images = FileContent.query.order_by(-FileContent.id).limit(10).all()
+    return render_template('index.html', images=images)
 
 
-@app.route('/upload/', methods=['GET', 'POST'])
-def upload():
-    if request.method == 'POST':
-        title = request.form['title']
-        inputFile = request.files['inputFile']
-        if not title:
-            flash('Title is required!', 'error')
-        elif not inputFile:
-            flash('Image is required!', 'error')
-        else:
-            data = inputFile.read()
+@app.route('/daily/', methods=['GET'])
+def daily():
+    try:
+        response = requests.get(quote_url)
+        data_str = response.text
+        data = json.loads(data_str)[0]
+        quote = data.get("q")
+        author = data.get("a")
+        quote_author = {'quote': quote, 'author': author}
+
+        try:
+            url = get_image_url(quote)
+            response = requests.get(url, stream=True)
+            data = response.content
             render_file = render_picture(data)
-            new_file = FileContent(title=title, data=data, rendered_data=render_file)
+            new_file = FileContent(title='Quotes', data=data, rendered_data=render_file)
             db.session.add(new_file)
             db.session.commit()
-            # Return to index and show all images
-            return redirect(url_for('index'))
+            image = {'url': url}
+            return render_template('daily.html', quote=quote_author, image=image)
 
-    return render_template('upload.html')
+        except Exception as e:
+            print(e)
+            image = None
+            flash('Image creation error!')
+
+    except Exception as e:
+        print(e)
+        quote_author = None
+        image = None
+        flash('Quote retrieval error!')
+
+
+    return render_template('daily.html', quote=quote_author, image=image)
 
 
 @app.route('/delete', methods=['GET'])
@@ -80,7 +99,7 @@ def delete():
     img_id = request.args['img_id']
     FileContent.query.filter_by(id=img_id).delete()
     db.session.commit()
-    flash(f"Image with id = {img_id} deleted!", 'warning')
+    flash(f"Image deleted!", 'warning')
     return redirect(url_for('index'))
 
 
@@ -103,13 +122,12 @@ def create():
                 new_file = FileContent(title=title, data=data, rendered_data=render_file)
                 db.session.add(new_file)
                 db.session.commit()
-                #return redirect(url_for('index'))
                 image = {"title": title, 'url': url}
                 return render_template('create.html', image=image)
 
             except Exception as e:
                 print(e)
-                flash('AI creation error! Please, try something else.')
+                flash('Image creation error! Please, try something else.')
 
     return render_template('create.html')
 
