@@ -12,6 +12,10 @@ a {
   color: white;
 }
 
+a:hover {
+  color: #d64161;
+}
+
 .image_field {
     margin-top: 3vh;
     padding: 10px;
