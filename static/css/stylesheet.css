@@ -40,7 +40,7 @@ a:hover {
 }
 
 .nav-link-user {
-    font-size: 1vh;
+    color: grey;
 }
 
 .navbar-collapse {
@@ -56,27 +56,22 @@ a:hover {
 .alert {
     color: #970020;
     background-color: #ffd5de;
-    padding: 10px;
-    height: 66px;
-    position: absolute;
-    float: left;
-    top: 70%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-    animation:alert-response 4s 1;
-    -webkit-animation:alert-response 4s 1;
-    animation-fill-mode: forwards;
 }
 
 .success {
     color: #006400;
     background-color: #90ee90;
-    padding: 10px;
-    height: 66px;
+}
+
+.flasher {
+    font-size: 1.5em;
+    padding-left: 10%;
+    padding-right: 10%;
+    padding-top: 5%;
+    padding-bottom: 5%;
     position: absolute;
     float: left;
-    top: 70%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2;

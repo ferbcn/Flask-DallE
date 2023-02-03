@@ -17,7 +17,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
 from datetime import datetime
-from flask_migrate import Migrate
+# from flask_migrate import Migrate
 
 openai.api_key = os.getenv("OPENAI_KEY")
 quote_url = 'https://zenquotes.io/api/quotes'
@@ -67,21 +67,31 @@ class FileContent(db.Model):
 
 
 #migrate = Migrate(app, db)
-#db.drop_all()
+
+# flask --app main.py db init
+# flask --app main.py db migrate
+# flask --app main.py db upgrade
 
 login = LoginManager()
 login.init_app(app)
 
 @login.user_loader
 def load_user(id):
-    return UserModel.query.get(int(id))
+    return db.session.query(UserModel).get(int(id))
 
 
 # Index It routes to index.html where the upload forms is
 @app.route('/index', methods=['GET', 'POST'])
 @app.route('/')
 def index():
-    db.create_all()
+    ### Danger ###
+    # Delete all users
+    # db.session.query(UserModel).delete()
+    # db.session.commit()
+    # Delete all tables
+    # db.drop_all()
+    ##############
+    # db.create_all()
 
     # read last 10 images from db
     # images = FileContent.query.limit(10).all()
@@ -177,7 +187,7 @@ def delete():
     img_id = request.args['img_id']
     FileContent.query.filter_by(id=img_id).delete()
     db.session.commit()
-    flash(f"Image deleted!", 'warning')
+    flash(f"Image deleted!", 'success')
     return redirect(url_for('index'))
 
 
@@ -206,8 +216,9 @@ def login():
         user = UserModel.query.filter_by(username=username).first()
         if user is not None and user.check_password(request.form['password']):
             login_user(user)
+            flash('User logged in!', 'success')
             return redirect(url_for('index'))
-        flash('Wrong credentials!')
+        flash('Wrong credentials!', 'alert')
 
     return render_template('login.html')
 
@@ -220,23 +231,28 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
-        existing_user = UserModel.query.filter_by(username=username).first()
-        print(existing_user)
-        if existing_user is None:
-            try:
-                user = UserModel(username=username)
-                user.set_password(password)
-                db.session.add(user)
-                db.session.commit()
-                flash(f"User {username} created!", 'success')
-                return redirect(url_for('login'))
-            except Exception as e:
-                print(e)
-                flash("Error!")
+        if len(username) < 3:
+            flash("Username too short", 'alert')
+        elif len(password) < 3:
+            flash("Password too short", 'alert')
         else:
-            flash("Username already in use!", 'alert')
-
+            existing_user = UserModel.query.filter_by(username=username).first()
+            if existing_user is None:
+                # create user if it does not exist in DB
+                try:
+                    user = UserModel(username=username)
+                    user.set_password(password)
+                    db.session.add(user)
+                    db.session.commit()
+                    flash(f"User {username} created!", 'success')
+                    return redirect(url_for('login'))
+                except Exception as e:
+                    print(e)
+                    flash("DB Error!", 'alert')
+            # user already exists
+            else:
+                flash("Username already in use!", 'alert')
+    # GET request
     return render_template('register.html')
 
 
@@ -262,4 +278,4 @@ def render_picture(data):
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
-    app.run(host='0.0.0.0', threaded=True, port=80, debug=True)
+    app.run(host='0.0.0.0', threaded=True, port=80, debug=False)
