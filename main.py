@@ -1,36 +1,34 @@
 # Built-in Imports
 import json
 import os
-from datetime import datetime
 import base64
+
+# OpenAI
 import openai
 
 # Flask
 import requests
 from flask import Flask, render_template, request, flash, redirect, url_for, send_file
-
 # Flask SQLAlchemy, Database
 from flask_sqlalchemy import SQLAlchemy
-
 from flask_login import LoginManager, login_required, login_user, current_user, logout_user
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
-openai.api_key = os.getenv("OPENAI_KEY")
+from datetime import datetime
+from flask_migrate import Migrate
 
+openai.api_key = os.getenv("OPENAI_KEY")
 quote_url = 'https://zenquotes.io/api/quotes'
 
+# Local DB
 # basedir = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data.sqlite')
 
-db_name = 'postgres'
+db_name = os.environ.get('DB_NAME')
 db_user = os.environ.get('DB_USER')
 db_pass = os.environ.get('DB_PASSWORD')
 db_url = os.environ.get('DB_URL')
-
-db_user='linpostgres'
-db_pass='3nO8^pLROrxmqFkF'
-db_url='lin-15294-4856-pgsql-primary.servers.linodedb.net'
 
 basedir = f"postgresql://{db_user}:{db_pass}@{db_url}:5432/{db_name}"
 
@@ -40,12 +38,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 db = SQLAlchemy(app)
 
-from flask_migrate import Migrate
-
-migrate = Migrate(app, db)
 
 class UserModel(UserMixin, db.Model):
-    __tablename__ = 'dalle-users'
+    __tablename__ = 'art-users'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True)
@@ -71,8 +66,11 @@ class FileContent(db.Model):
         return f'Pic Name: {self.title}, created on: {self.pic_date}'
 
 
-login = LoginManager()
+#migrate = Migrate(app, db)
+#db.drop_all()
 
+
+login = LoginManager()
 login.init_app(app)
 
 @login.user_loader
@@ -223,14 +221,16 @@ def register():
         username = request.form['username']
         password = request.form['password']
 
-        if UserModel.query.filter_by(username=username):
-            flash("Username already in use!")
-        else:
+        #if UserModel.query.filter_by(username=username):
+        try:
             user = UserModel(username=username)
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
             return redirect(url_for('login'))
+        except Exception as e:
+            print(e)
+            flash("Error!")
 
     return render_template('register.html')
 
