@@ -69,7 +69,6 @@ class FileContent(db.Model):
 #migrate = Migrate(app, db)
 #db.drop_all()
 
-
 login = LoginManager()
 login.init_app(app)
 
@@ -137,15 +136,6 @@ def quote():
 
     return render_template('quote.html', quote=quote_author, user_auth=user_auth)
 
-@app.route('/delete', methods=['GET'])
-@login_required
-def delete():
-    img_id = request.args['img_id']
-    FileContent.query.filter_by(id=img_id).delete()
-    db.session.commit()
-    flash(f"Image deleted!", 'warning')
-    return redirect(url_for('index'))
-
 
 @app.route('/create/', methods=('GET', 'POST'))
 def create():
@@ -179,6 +169,16 @@ def create():
                 flash('Image creation error! Please, try something else.')
 
     return render_template('create.html', user_auth=user_auth)
+
+
+@app.route('/delete', methods=['GET'])
+@login_required
+def delete():
+    img_id = request.args['img_id']
+    FileContent.query.filter_by(id=img_id).delete()
+    db.session.commit()
+    flash(f"Image deleted!", 'warning')
+    return redirect(url_for('index'))
 
 
 @app.route('/about', methods=['GET'])
@@ -221,16 +221,21 @@ def register():
         username = request.form['username']
         password = request.form['password']
 
-        #if UserModel.query.filter_by(username=username):
-        try:
-            user = UserModel(username=username)
-            user.set_password(password)
-            db.session.add(user)
-            db.session.commit()
-            return redirect(url_for('login'))
-        except Exception as e:
-            print(e)
-            flash("Error!")
+        existing_user = UserModel.query.filter_by(username=username).first()
+        print(existing_user)
+        if existing_user is None:
+            try:
+                user = UserModel(username=username)
+                user.set_password(password)
+                db.session.add(user)
+                db.session.commit()
+                flash(f"User {username} created!")
+                return redirect(url_for('login'))
+            except Exception as e:
+                print(e)
+                flash("Error!")
+        else:
+            flash("Username already in use!")
 
     return render_template('register.html')
 
@@ -248,6 +253,7 @@ def get_image_url(prompt):
     return image_url
 
 
+# needed to save the image in base64 in DB: this should be don in an object storage like S3
 def render_picture(data):
     render_pic = base64.b64encode(data).decode('ascii')
     return render_pic
