@@ -10,10 +10,11 @@
       <br>
       <form action="{{ url_for('register') }}" method="post">
           Username: <input class="form-control" name="username" type="text" placeholder="username">
-          E-mail: <input class="form-control" name="email" type="text" value="test@email.com">
           Password: <input class="form-control" name="password" type="password" placeholder="password">
           <br>
-          <button class="btn btn-danger">Register</button>
+          <input type="submit" value="Submit">
+          <br>
+          <br>
       </form>
       <br>
       Already singed-up? <a href="{{ url_for('login') }}">Login here</a>

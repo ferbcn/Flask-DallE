@@ -1,7 +1,13 @@
+:root {
+  --main_color: #d64161;
+  --white: #ffffff;
+}
+
+
 html, body {
     font-family: "Lucida Console", "Courier New", monospace;
     background-color: black;
-    color: #d64161;
+    color: var(--main_color);
 }
 
 h3 {
@@ -13,7 +19,7 @@ a {
 }
 
 a:hover {
-  color: #d64161;
+  color: var(--main_color);
 }
 
 .image_field {
@@ -25,12 +31,16 @@ a:hover {
 
 .navbar-brand {
     margin-left: 2vw;
-    color: #d64161;
+    color: var(--main_color);
 }
 
 .nav-link {
     margin-left:2vw;
-    color: #d64161;
+    color: var(--main_color);
+}
+
+.nav-link-user {
+    font-size: 1vh;
 }
 
 .navbar-collapse {
@@ -73,7 +83,7 @@ a:hover {
 /* Style the submit button */
 input[type=submit]{
   margin-top: 0vh;
-  background-color: #d64161;
+  background-color: var(--main_color);
   color: white;
   padding: 12px 20px;
   border: none;
