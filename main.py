@@ -118,7 +118,7 @@ def quote():
             return render_template('quote.html', quote=quote_author, image=image, user_auth=user_auth)
         except Exception as e:
             print(e)
-            flash('Image creation error!')
+            flash('Image creation error!', 'alert')
 
     try:
         response = requests.get(quote_url)
@@ -132,7 +132,7 @@ def quote():
         print(e)
         quote_author = None
 
-        flash('Quote retrieval error!')
+        flash('Quote retrieval error!', 'alert')
 
     return render_template('quote.html', quote=quote_author, user_auth=user_auth)
 
@@ -149,9 +149,9 @@ def create():
         content = request.form['content']
 
         if not title:
-            flash('Title is required!')
+            flash('Title is required!', 'alert')
         elif not content:
-            flash('Content is required!')
+            flash('Content is required!', 'alert')
         else:
             try:
                 url = get_image_url(content)
@@ -166,7 +166,7 @@ def create():
 
             except Exception as e:
                 print(e)
-                flash('Image creation error! Please, try something else.')
+                flash('Image creation error! Please, try something else.', 'alert')
 
     return render_template('create.html', user_auth=user_auth)
 
@@ -229,13 +229,13 @@ def register():
                 user.set_password(password)
                 db.session.add(user)
                 db.session.commit()
-                flash(f"User {username} created!")
+                flash(f"User {username} created!", 'success')
                 return redirect(url_for('login'))
             except Exception as e:
                 print(e)
                 flash("Error!")
         else:
-            flash("Username already in use!")
+            flash("Username already in use!", 'alert')
 
     return render_template('register.html')
 
@@ -243,6 +243,7 @@ def register():
 @app.route('/logout')
 def logout():
     logout_user()
+    flash(f"User logged out!", 'success')
     return redirect(url_for('index'))
 
 

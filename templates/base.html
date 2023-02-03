@@ -64,12 +64,15 @@
     {% block body %}
     {% endblock %}
 
-    <div class="content">
-        {% for message in get_flashed_messages() %}
-            <div class="alert">{{ message }}</div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+    <div class="flasher {{ category }}">{{ message }}</div>
         {% endfor %}
-        {% block content %} {% endblock %}
-    </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %} {% endblock %}
 
     <div class="text-center">
         <div class="spinner-border text-light" id="spinner" role="status">
