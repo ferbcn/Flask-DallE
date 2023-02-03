@@ -7,18 +7,18 @@
     <div id="form_child">
         <h1>{% block title %} Create an Image {% endblock %}</h1>
         <form method="post" onSubmit="return handleClick()">
-            <label for="title">Title</label>
+            Title
             <br>
             <input class="form-control" type="text" name="title" placeholder="Image title"
                    value="{{ request.form['title'] }}">
             <br>
 
-            <label for="content">AI instructions</label>
+            AI instructions
             <br>
             <input class="form-control" type="text" name="content" placeholder="Image content decription"
                    value="{{ request.form['content'] }}">
             <br>
-            <input type="submit" value="Submit">
+            <input type="submit" value="Create">
         </form>
 
         <br>

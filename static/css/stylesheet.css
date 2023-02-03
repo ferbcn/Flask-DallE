@@ -134,9 +134,9 @@ img{
 }
 
 .spinner-border {
-  visibility: hidden;
-  width: 5rem;
-  height: 5rem;
+    visibility: hidden;
+    width: 5rem;
+height: 5rem;
 }
 
 .form-control{
