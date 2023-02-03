@@ -35,9 +35,8 @@ basedir = f"postgresql://{db_user}:{db_pass}@{db_url}:5432/{db_name}"
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = basedir
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-db = SQLAlchemy(app)
 
+db = SQLAlchemy(app)
 
 class UserModel(UserMixin, db.Model):
     __tablename__ = 'art-users'
@@ -278,4 +277,4 @@ def render_picture(data):
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
-    app.run(host='0.0.0.0', threaded=True, port=80, debug=False)
+    app.run(host='0.0.0.0', threaded=True, port=80, debug=True)
