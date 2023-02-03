@@ -25,14 +25,17 @@ quote_url = 'https://zenquotes.io/api/quotes'
 # Local DB
 # basedir = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data.sqlite')
 
-db_name = os.environ.get('DB_NAME')
-db_user = os.environ.get('DB_USER')
-db_pass = os.environ.get('DB_PASSWORD')
-db_url = os.environ.get('DB_URL')
+DB_NAME = os.environ.get('DB_NAME')
+DB_USER = os.environ.get('DB_USER')
+DB_PASS = os.environ.get('DB_PASSWORD')
+DB_URL = os.environ.get('DB_URL')
 
-basedir = f"postgresql://{db_user}:{db_pass}@{db_url}:5432/{db_name}"
+SECRET_KEY = os.environ.get('SECRET_KEY')
+
+basedir = f"postgresql://{DB_USER}:{DB_PASS}@{DB_URL}:5432/{DB_NAME}"
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = basedir
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
