@@ -5,9 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-# Local DB
-# basedir = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data.sqlite')
-
 class UserModel(UserMixin, db.Model):
     __tablename__ = 'art-users'
 

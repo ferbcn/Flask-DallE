@@ -34,6 +34,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 basedir = f"postgresql://{DB_USER}:{DB_PASS}@{DB_URL}:5432/{DB_NAME}"
 
+# Local DB
+# basedir = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'data.sqlite')
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = basedir
