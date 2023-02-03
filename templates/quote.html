@@ -3,8 +3,8 @@
 {% block content %}
 
 <div class="container">
-  <div id="form_parent">
-    <div id="form_child">
+  <div id="parent">
+    <div id="child">
         <h1>
             {% block title %} Quote of the day {% endblock %}
             <a href="{{ url_for('quote') }}">
@@ -28,14 +28,13 @@
         </form>
 
         <br>
-        <div class="image_view">
+        <div class="image_view image_view_quote">
             {% if image %}
                 <div class='image_field'>
                     <img src="{{ image['url'] }}"/>
                 </div>
             {% endif %}
         </div>
-
     </div>
   </div>
 </div>

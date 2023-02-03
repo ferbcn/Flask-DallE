@@ -125,18 +125,17 @@ img{
     height: auto;
 }
 
-#image_frame{
-    align-items: right;
-}
-
-.image_view{
-    margin-top: 10%;
+.image_view_quote{
+    margin-top: 15%;
 }
 
 .spinner-border {
     visibility: hidden;
     width: 5rem;
-height: 5rem;
+    height: 5rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
 }
 
 .form-control{
