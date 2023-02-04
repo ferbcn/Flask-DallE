@@ -6,19 +6,25 @@
     <div id="image_child">
         <div class='image_field'>
             <h4>
-                <p>Educational Website</p>
-                <p>for creating images with</p>
+                <p>Educational Website for</p>
             </h4>
             <h3>
                 <p>Artificial Intelligence</p>
+                <p>Image Generation</p>
             </h3>
             <br>
             {% if num_images %}
             <h4>
-                Total images in DB:
+                Images in DB:
             </h4>
             <h3>
                 {{ num_images }}
+            </h3>
+            <h4>
+                Total images created:
+            </h4>
+            <h3>
+                {{ total_images }}
             </h3>
             {% endif %}
         </div>

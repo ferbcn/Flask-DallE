@@ -230,7 +230,15 @@ def about():
     except Exception as e:
         print(e)
         num_images = None
-    return render_template('about.html', num_images=num_images, user_auth=user_auth)
+    try:
+        num_images = FileContent.query.count()
+        last_image = FileContent.query.order_by(-FileContent.id).first()
+        total_images = last_image.id
+    except Exception as e:
+        print(e)
+        num_images = None
+        total_images = None
+    return render_template('about.html', num_images=num_images, total_images=total_images, user_auth=user_auth)
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -256,7 +264,7 @@ def register():
 
     # user registration deactivated
     if request.method == 'POST':
-        flash("Not available!", 'alert')
+        flash("Sorry, registration is not available!", 'alert')
     """
         username = request.form['username']
         password = request.form['password']
