@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // window scroll detect
     window.onscroll = function() {
 
-        if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 100 && !waiting) {
+        if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight && !waiting) {
 
             var socket = io();
             // websockets send more images

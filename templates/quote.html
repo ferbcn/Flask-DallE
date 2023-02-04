@@ -31,10 +31,12 @@
         <div class="image_view image_view_quote">
             {% if image %}
                 <div class='image_field'>
+                    <h3>{{ image['title'] }}</h3>
                     <img src="{{ image['url'] }}"/>
                 </div>
             {% endif %}
         </div>
+
     </div>
   </div>
 </div>

@@ -145,7 +145,7 @@ def quote():
             new_file = FileContent(title=author, data=data, rendered_data=render_file)
             db.session.add(new_file)
             db.session.commit()
-            image = {'url': url}
+            image = {'title': author, 'url': url}
             return render_template('quote.html', quote=quote_author, image=image, user_auth=user_auth)
         except Exception as e:
             print(e)
@@ -162,7 +162,6 @@ def quote():
     except Exception as e:
         print(e)
         quote_author = None
-
         flash('Quote retrieval error!', 'alert')
 
     return render_template('quote.html', quote=quote_author, user_auth=user_auth)
