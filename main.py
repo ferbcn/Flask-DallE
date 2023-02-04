@@ -204,14 +204,18 @@ def create():
 
 
 @app.route('/delete', methods=['GET'])
-@login_required
+#@login_required
 def delete():
-    img_id = request.args['img_id']
-    FileContent.query.filter_by(id=img_id).delete()
-    db.session.commit()
-    flash(f"Image deleted!", 'success')
-    app.logger.info(f'{current_user} deleted image id={img_id}')
-    return redirect(url_for('index'))
+    if not current_user.is_authenticated:
+        flash("Not authenticated!", 'alert')
+        return redirect(url_for('index'))
+    else:
+        img_id = request.args['img_id']
+        FileContent.query.filter_by(id=img_id).delete()
+        db.session.commit()
+        flash(f"Image deleted!", 'success')
+        app.logger.info(f'{current_user} deleted image id={img_id}')
+        return redirect(url_for('index'))
 
 
 @app.route('/about', methods=['GET'])
@@ -249,6 +253,9 @@ def login():
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    # deactivate registration
+    else:
         return redirect(url_for('index'))
 
     if request.method == 'POST':

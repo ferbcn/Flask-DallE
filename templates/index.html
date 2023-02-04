@@ -8,11 +8,9 @@
             <div class='image_field'>
                 <h3>{{ image['title'] }}</h3>
                 <img src="data:;base64,{{ image['rendered_data'] }}"/>
-                {% if user_auth %}
                 <div class="del_but">
                     <a href={{url_for('delete')}}?img_id={{image['id']}}>Delete</a>
                 </div>
-                {% endif %}
             </div>
         {% endfor %}
     </div>

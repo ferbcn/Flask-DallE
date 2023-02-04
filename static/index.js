@@ -28,15 +28,24 @@ window.onscroll = function() {
             var all_nodes = [];
             for (var i=0; i<images.length; i++){
                 //var node = "<div class='image_field'><center><h3>" + images[i]['title'] + "</h3></center><img src='data:image;base64," + images[i]['data'] + "'/></div>";
-                //all_nodes.push(node);
+                // create new image node
                 var new_image = document.createElement('div');
+                // add title
                 new_image.innerHTML += "<center><h3>" + images[i]['title'] + "</h3></center>";
-
                 new_image.classList.add('image_field');
-
+                // add image
                 var img = document.createElement('img');
                 img.src = "data:image;base64," + images[i]['data'];
                 new_image.appendChild(img);
+                // add delete link
+
+                var del_text = document.createElement('a');
+                del_text.href = "/delete?img_id=" + images[i]["image_id"];
+                del_text.appendChild(document.createTextNode("Delete"));
+                new_image.appendChild(del_text);
+
+                //textNode.a.href = "/delete?img_id=" + images[i]["image_id"];
+                //new_image.appendChild(textNode);
 
                 document.getElementById('image_child').appendChild(new_image);
             }
