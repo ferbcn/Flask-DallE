@@ -60,7 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     //textNode.a.href = "/delete?img_id=" + images[i]["image_id"];
                     //new_image.appendChild(textNode);
 
-                    document.getElementById('image_child').appendChild(new_image);
+                    const list = document.getElementById("image_child");
+                    // delete first entry in image list befor we add the next
+                    list.removeChild(list.firstElementChild);
+                    list.appendChild(new_image);
+                    //document.getElementById('image_child').appendChild(new_image);
                 }
                 last_img_id = images[images.length-1]["image_id"];
                 //document.querySelector('#image_child').innerHTML += all_nodes;
