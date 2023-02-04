@@ -19,6 +19,8 @@ from flask_login import UserMixin
 from datetime import datetime
 # from flask_migrate import Migrate
 
+from flask_socketio import SocketIO, emit, join_room, leave_room, send
+
 openai.api_key = os.getenv("OPENAI_KEY")
 quote_url = 'https://zenquotes.io/api/quotes'
 
@@ -43,6 +45,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = basedir
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+socketio = SocketIO(app)
 
 class UserModel(UserMixin, db.Model):
     __tablename__ = 'art-users'
@@ -71,6 +74,18 @@ class FileContent(db.Model):
         return f'Pic Name: {self.title}, created on: {self.pic_date}'
 
 
+socketio = SocketIO(app, always_connect=True, engineio_logger=True)
+
+@socketio.on('connect')
+def connected():
+    print('connect')
+
+
+@socketio.on('disconnect')
+def disconnect():
+    print('disconnect')
+
+
 #migrate = Migrate(app, db)
 
 # flask --app main.py db init
@@ -82,7 +97,8 @@ login.init_app(app)
 
 @login.user_loader
 def load_user(id):
-    return db.session.query(UserModel).get(int(id))
+    #return db.session.query(UserModel).get(int(id))
+    return UserModel.query.get(int(id))
 
 
 # Index It routes to index.html where the upload forms is
@@ -177,6 +193,7 @@ def create():
                 db.session.add(new_file)
                 db.session.commit()
                 image = {"title": title, 'url': url}
+                app.logger.info(f'{current_user} created an image')
                 return render_template('create.html', image=image, user_auth=user_auth)
 
             except Exception as e:
@@ -193,6 +210,7 @@ def delete():
     FileContent.query.filter_by(id=img_id).delete()
     db.session.commit()
     flash(f"Image deleted!", 'success')
+    app.logger.info(f'{current_user} deleted image id={img_id}')
     return redirect(url_for('index'))
 
 
@@ -281,6 +299,36 @@ def render_picture(data):
     return render_pic
 
 
+@socketio.on('my_event')
+def handle_my_custom_event(json):
+    last_img_id = json["data"]
+    next_images_count = 5
+    print(f"Loading {next_images_count} more images...")
+
+    # Hacky way for retrieving next images in db
+    if last_img_id == 0:
+        images = FileContent.query.order_by(-FileContent.id).limit(10 + next_images_count).all()[10:]
+    else:
+        n=0
+        images = []
+        while n<5:
+            try:
+                last_img_id -= 1
+                next_image = FileContent.query.get(last_img_id)
+                images.append(next_image)
+                n += 1
+            except Exception as e:
+                print(e)
+    # End of Hack
+
+    images_json_data = []
+    for image in images:
+        img = {"title": image.title, "rendered_data": image.rendered_data, "image_id": image.id}
+        images_json_data.append(img)
+
+    print("Sending images to web-socket!")
+    emit('image feed', images_json_data)
+
+
 if __name__ == '__main__':
-    # Threaded option to enable multiple instances for multiple user access support
-    app.run(host='0.0.0.0', threaded=True, port=80, debug=False)
+    socketio.run(app, host='0.0.0.0', port='5000', allow_unsafe_werkzeug=True)
