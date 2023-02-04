@@ -249,16 +249,15 @@ def login():
 
     return render_template('login.html')
 
-
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    # deactivate registration
-    else:
-        return redirect(url_for('index'))
 
+    # user registration deactivated
     if request.method == 'POST':
+        flash("Not available!", 'alert')
+    """
         username = request.form['username']
         password = request.form['password']
         if len(username) < 3:
@@ -282,6 +281,7 @@ def register():
             # user already exists
             else:
                 flash("Username already in use!", 'alert')
+    """
     # GET request
     return render_template('register.html')
 
