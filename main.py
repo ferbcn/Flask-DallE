@@ -124,6 +124,18 @@ def handle_my_custom_event(json):
     emit('image feed', images_json_data)
 
 
+@socketio.on('delete_event')
+def handle_delete_event(json):
+    image_id = json["data"]
+    print(f"Deleting image... {image_id}")
+    if current_user.is_authenticated:
+        FileContent.query.filter_by(id=image_id).delete()
+        db.session.commit()
+        flash(f"Image deleted!", 'success')
+    else:
+        print("Not logged in. Image not deleted.")
+
+
 linode_obj_config = {
     "aws_access_key_id": "JMUZU4LBJM1GITDW7ZII",
     "aws_secret_access_key": "bn0hxe2QhBIDi9WJue3T8p80IU3W2Cpt5hA9vaoM",

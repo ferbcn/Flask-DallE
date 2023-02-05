@@ -6,11 +6,11 @@
   <div id="image_parent">
     <div id="image_child">
         {% for image in images %}
-            <div class='image_field'>
+            <div class='image_field' id="{{ image['id'] }}">
                 <h3>{{ image['title'] }}</h3>
                 <img src="data:;base64,{{ image['rendered_data'] }}"/>
                 <div class="del_but">
-                    <a href={{url_for('delete')}}?img_id={{image['id']}}>Delete</a>
+                    <a href="javascript:handleDelete({{image['id']}})">Delete</a>
                 </div>
             </div>
         {% endfor %}
