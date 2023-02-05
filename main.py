@@ -274,11 +274,11 @@ def edit():
         instructions = request.form['instructions']
         file = request.files['inputFile']
         if not title:
-            flash('Title is required!', 'error')
+            flash('Title is required!', 'alert')
         elif not file:
-            flash('Image is required!', 'error')
+            flash('Image is required!', 'alert')
         elif not instructions:
-            flash('AI instructions required!', 'error')
+            flash('AI instructions required!', 'alert')
         else:
             data = file.read()
 
@@ -291,19 +291,23 @@ def edit():
                 new_image_url = edit_image_ai(data, instructions)
                 response = requests.get(new_image_url, stream=True)
                 data = response.content
+
+                # make filename and upload file to S3
+                filename = "AI_" + make_filename(title)
+                create_s3_upload_thread(filename, data)
+
+                render_file = render_picture(data)
+                new_file = FileContent(title=title, data=data, filename=filename, rendered_data=render_file)
+                db.session.add(new_file)
+                db.session.commit()
+                image = {"title": title, 'url': new_image_url}
+                app.logger.info(f'{current_user} created an image')
+                return render_template('edit.html', image=image, user_auth=user_auth)
+
             except Exception as e:
                 print(e)
-
-            # make filename and upload file to S3
-            filename = "AI_" + make_filename(title)
-            create_s3_upload_thread(filename, data)
-
-            render_file = render_picture(data)
-            new_file = FileContent(title=title, data=data, filename=filename, rendered_data=render_file)
-            db.session.add(new_file)
-            db.session.commit()
-            # Return to index and show all images
-            return redirect(url_for('index'))
+                app.logger.warning(f'API error {e}')
+                flash('Wrong image format', 'alert')
 
     return render_template('edit.html', user_auth=user_auth)
 
@@ -315,11 +319,6 @@ def about():
     else:
         user_auth = False
 
-    try:
-        num_images = FileContent.query.count()
-    except Exception as e:
-        print(e)
-        num_images = None
     try:
         num_images = FileContent.query.count()
         last_image = FileContent.query.order_by(-FileContent.id).first()

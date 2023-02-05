@@ -5,7 +5,7 @@
 <div class="container">
   <div id="parent">
     <div id="child">
-        <h1>{% block title %} Create an Image {% endblock %}</h1>
+        <h1>{% block title %} Edit an Image {% endblock %}</h1>
         <form method="post" onSubmit="return handleClick()" enctype="multipart/form-data">
             Title
             <br>
@@ -25,7 +25,7 @@
                    value="{{ request.form['instructions'] }}">
             <br>
             <br>
-            <input type="submit" value="Create Image">
+            <input type="submit" value="Edit Image">
             <br>
         </form>
 
