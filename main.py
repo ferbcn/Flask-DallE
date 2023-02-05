@@ -4,6 +4,8 @@ import os
 import base64
 
 # OpenAI
+import threading
+
 import openai
 
 # Flask
@@ -17,9 +19,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
 from datetime import datetime
-# from flask_migrate import Migrate
+from flask_migrate import Migrate
 
-from flask_socketio import SocketIO, emit, join_room, leave_room, send
+from flask_socketio import SocketIO, emit
+
+import boto3
 
 openai.api_key = os.getenv("OPENAI_KEY")
 quote_url = 'https://zenquotes.io/api/quotes'
@@ -45,6 +49,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = basedir
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
 socketio = SocketIO(app)
 
 class UserModel(UserMixin, db.Model):
@@ -66,6 +71,7 @@ class FileContent(db.Model):
     """ ___tablename__ = 'yourchoice' """  # You can override the default table name
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Text)
+    filename = db.Column(db.Text)
     data = db.Column(db.LargeBinary, nullable=False)  # Actual data, needed for Download
     rendered_data = db.Column(db.Text, nullable=False)  # Data to render the pic in browser
     pic_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -75,6 +81,7 @@ class FileContent(db.Model):
 
 
 socketio = SocketIO(app, always_connect=True, engineio_logger=True)
+
 
 @socketio.on('connect')
 def connected():
@@ -86,7 +93,47 @@ def disconnect():
     print('disconnect')
 
 
-#migrate = Migrate(app, db)
+@socketio.on('my_event')
+def handle_my_custom_event(json):
+    last_img_id = json["data"]
+    print("last img id:", last_img_id)
+    print(f"Loading more images...")
+    new_image_count = 5
+
+    # Hacky way for retrieving next images in db
+    if last_img_id == 0:
+        images = FileContent.query.order_by(-FileContent.id).limit(10 + new_image_count).all()[10:]
+    else:
+        images = []
+        found_img_count = 0
+        while (found_img_count < new_image_count):
+            # Iterate through DB: TODO: look-up sqlalchemy on this topic
+            last_img_id -= 1
+            next_image = FileContent.query.get(last_img_id)
+            if next_image is not None:
+                images.append(next_image)
+                found_img_count += 1
+    # End of Hack
+
+    images_json_data = []
+    for image in images:
+        img = {"title": image.title, "data": image.rendered_data, "image_id": image.id}
+        images_json_data.append(img)
+
+    print("Sending images to web-socket!")
+    emit('image feed', images_json_data)
+
+
+linode_obj_config = {
+    "aws_access_key_id": "JMUZU4LBJM1GITDW7ZII",
+    "aws_secret_access_key": "bn0hxe2QhBIDi9WJue3T8p80IU3W2Cpt5hA9vaoM",
+    "endpoint_url": "https://art-intel.eu-central-1.linodeobjects.com",
+}
+
+client = boto3.client("s3", **linode_obj_config)
+
+
+migrate = Migrate(app, db)
 
 # flask --app main.py db init
 # flask --app main.py db migrate
@@ -94,6 +141,7 @@ def disconnect():
 
 login = LoginManager()
 login.init_app(app)
+
 
 @login.user_loader
 def load_user(id):
@@ -140,13 +188,21 @@ def quote():
             url = get_image_url(quote)
             response = requests.get(url, stream=True)
             data = response.content
+
+            # add file to S3
+            filename = author.replace(" ", "_") + "_" + str(datetime.utcnow()).replace(" ", "_") + ".png"
+            s3_upload_thread = threading.Thread(target=s3_upload_job(filename, data))
+            s3_upload_thread.start()
+            print('Scheduled S3 upload job!')
+
             render_file = render_picture(data)
             # add file to db
-            new_file = FileContent(title=author, data=data, rendered_data=render_file)
+            new_file = FileContent(title=author, filename=filename, data=data, rendered_data=render_file)
             db.session.add(new_file)
             db.session.commit()
             image = {'title': author, 'url': url}
             return render_template('quote.html', quote=quote_author, image=image, user_auth=user_auth)
+
         except Exception as e:
             print(e)
             flash('Image creation error!', 'alert')
@@ -165,6 +221,19 @@ def quote():
         flash('Quote retrieval error!', 'alert')
 
     return render_template('quote.html', quote=quote_author, user_auth=user_auth)
+
+
+def s3_upload_job(filename, data):
+    # some long running processing here
+    try:
+        filepath = "static/images/" + filename
+        with open(filepath, 'wb') as f:
+            f.write(data)
+        client = boto3.client("s3", **linode_obj_config)
+        client.upload_file(Filename=filepath, Bucket='DallE-Images', Key=filename)
+        os.remove(filepath)
+    except Exception as e:
+        print(e)
 
 
 @app.route('/create/', methods=('GET', 'POST'))
@@ -187,8 +256,16 @@ def create():
                 url = get_image_url(content)
                 response = requests.get(url, stream=True)
                 data = response.content
+
+                # add file to S3
+                filename = title.replace(" ", "_") + "_" + str(datetime.utcnow()).replace(" ", "_") + ".png"
+                s3_upload_thread = threading.Thread(target=s3_upload_job(filename, data))
+                s3_upload_thread.start()
+                print('Scheduled S3 upload job!')
+
+                # save to Postgres
                 render_file = render_picture(data)
-                new_file = FileContent(title=title, data=data, rendered_data=render_file)
+                new_file = FileContent(title=title, data=data, filename=filename, rendered_data=render_file)
                 db.session.add(new_file)
                 db.session.commit()
                 image = {"title": title, 'url': url}
@@ -311,37 +388,6 @@ def get_image_url(prompt):
 def render_picture(data):
     render_pic = base64.b64encode(data).decode('ascii')
     return render_pic
-
-
-@socketio.on('my_event')
-def handle_my_custom_event(json):
-    last_img_id = json["data"]
-    print("last img id:", last_img_id)
-    print(f"Loading more images...")
-    new_image_count = 5
-
-    # Hacky way for retrieving next images in db
-    if last_img_id == 0:
-        images = FileContent.query.order_by(-FileContent.id).limit(10 + new_image_count).all()[10:]
-    else:
-        images = []
-        found_img_count = 0
-        while (found_img_count < new_image_count):
-            # Iterate through DB: TODO: look-up sqlalchemy on this topic
-            last_img_id -= 1
-            next_image = FileContent.query.get(last_img_id)
-            if next_image is not None:
-                images.append(next_image)
-                found_img_count += 1
-    # End of Hack
-
-    images_json_data = []
-    for image in images:
-        img = {"title": image.title, "data": image.rendered_data, "image_id": image.id}
-        images_json_data.append(img)
-
-    print("Sending images to web-socket!")
-    emit('image feed', images_json_data)
 
 
 if __name__ == '__main__':
