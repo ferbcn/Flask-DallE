@@ -11,3 +11,4 @@ psycopg2-binary
 flask_login
 flask_migrate
 flask_socketio
+boto3
