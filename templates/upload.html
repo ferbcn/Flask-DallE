@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+  <div id="parent">
+    <div id="child">
+        <h1>{% block title %} Create an Image {% endblock %}</h1>
+        <form method="post" onSubmit="return handleClick()">
+            Title
+            <br>
+            <input class="form-control" type="text" name="title" placeholder="Image title"
+                   value="{{ request.form['title'] }}">
+            <br>
+            File
+            <br>
+
+            <br>
+
+            AI instructions
+            <br>
+            <input class="form-control" type="text" name="content" placeholder="Image content decription"
+                   value="{{ request.form['content'] }}">
+            <br>
+            <br>
+            <input type="submit" value="Create Image">
+            <br>
+        </form>
+
+        <br>
+        <div class="image_view">
+            {% if image %}
+                <div class='image_field'>
+                    <h3>{{ image['title'] }}</h3>
+                    <img src="{{ image['url'] }}"/>
+                </div>
+            {% endif %}
+        </div>
+        <br>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
