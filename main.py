@@ -189,11 +189,9 @@ def quote():
             response = requests.get(url, stream=True)
             data = response.content
 
-            # add file to S3
-            filename = author.replace(" ", "_") + "_" + str(datetime.utcnow()).replace(" ", "_") + ".png"
-            s3_upload_thread = threading.Thread(target=s3_upload_job(filename, data))
-            s3_upload_thread.start()
-            print('Scheduled S3 upload job!')
+            # make filename and upload file to S3
+            filename = make_filename(author)
+            create_s3_upload_thread(filename, data)
 
             render_file = render_picture(data)
             # add file to db
@@ -223,19 +221,6 @@ def quote():
     return render_template('quote.html', quote=quote_author, user_auth=user_auth)
 
 
-def s3_upload_job(filename, data):
-    # some long running processing here
-    try:
-        filepath = "static/images/" + filename
-        with open(filepath, 'wb') as f:
-            f.write(data)
-        client = boto3.client("s3", **linode_obj_config)
-        client.upload_file(Filename=filepath, Bucket='DallE-Images', Key=filename)
-        os.remove(filepath)
-    except Exception as e:
-        print(e)
-
-
 @app.route('/create/', methods=('GET', 'POST'))
 def create():
     if current_user.is_authenticated:
@@ -257,11 +242,9 @@ def create():
                 response = requests.get(url, stream=True)
                 data = response.content
 
-                # add file to S3
-                filename = title.replace(" ", "_") + "_" + str(datetime.utcnow()).replace(" ", "_") + ".png"
-                s3_upload_thread = threading.Thread(target=s3_upload_job(filename, data))
-                s3_upload_thread.start()
-                print('Scheduled S3 upload job!')
+                # make filename and upload file to S3
+                filename = make_filename(title)
+                create_s3_upload_thread(filename, data)
 
                 # save to Postgres
                 render_file = render_picture(data)
@@ -279,19 +262,50 @@ def create():
     return render_template('create.html', user_auth=user_auth)
 
 
-@app.route('/delete', methods=['GET'])
-#@login_required
-def delete():
-    if not current_user.is_authenticated:
-        flash("Not authenticated!", 'alert')
-        return redirect(url_for('index'))
+@app.route('/edit/', methods=['GET', 'POST'])
+def edit():
+    if current_user.is_authenticated:
+        user_auth = True
     else:
-        img_id = request.args['img_id']
-        FileContent.query.filter_by(id=img_id).delete()
-        db.session.commit()
-        flash(f"Image deleted!", 'success')
-        app.logger.info(f'{current_user} deleted image id={img_id}')
-        return redirect(url_for('index'))
+        user_auth = False
+
+    if request.method == 'POST':
+        title = request.form['title']
+        instructions = request.form['instructions']
+        file = request.files['inputFile']
+        if not title:
+            flash('Title is required!', 'error')
+        elif not file:
+            flash('Image is required!', 'error')
+        elif not instructions:
+            flash('AI instructions required!', 'error')
+        else:
+            data = file.read()
+
+            # make filename and upload file to S3
+            filename = make_filename(title)
+            create_s3_upload_thread(filename, data)
+
+            # generate new image
+            try:
+                new_image_url = edit_image_ai(data, instructions)
+                response = requests.get(new_image_url, stream=True)
+                data = response.content
+            except Exception as e:
+                print(e)
+
+            # make filename and upload file to S3
+            filename = "AI_" + make_filename(title)
+            create_s3_upload_thread(filename, data)
+
+            render_file = render_picture(data)
+            new_file = FileContent(title=title, data=data, filename=filename, rendered_data=render_file)
+            db.session.add(new_file)
+            db.session.commit()
+            # Return to index and show all images
+            return redirect(url_for('index'))
+
+    return render_template('edit.html', user_auth=user_auth)
 
 
 @app.route('/about', methods=['GET'])
@@ -317,6 +331,22 @@ def about():
     return render_template('about.html', num_images=num_images, total_images=total_images, user_auth=user_auth)
 
 
+@app.route('/delete', methods=['GET'])
+# avoiding ugly page redirect here
+# @login_required
+def delete():
+    if not current_user.is_authenticated:
+        flash("Not authenticated!", 'alert')
+        return redirect(url_for('index'))
+    else:
+        img_id = request.args['img_id']
+        FileContent.query.filter_by(id=img_id).delete()
+        db.session.commit()
+        flash(f"Image deleted!", 'success')
+        app.logger.info(f'{current_user} deleted image id={img_id}')
+        return redirect(url_for('index'))
+
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if current_user.is_authenticated:
@@ -332,6 +362,7 @@ def login():
         flash('Wrong credentials!', 'alert')
 
     return render_template('login.html')
+
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -377,6 +408,29 @@ def logout():
     return redirect(url_for('index'))
 
 
+def create_s3_upload_thread(filename, data):
+    s3_upload_thread = threading.Thread(target=s3_upload_job(filename, data))
+    s3_upload_thread.start()
+    print('Scheduled S3 upload job!')
+
+
+def s3_upload_job(filename, data):
+    # some long running processing here
+    try:
+        filepath = "static/images/" + filename
+        with open(filepath, 'wb') as f:
+            f.write(data)
+        client = boto3.client("s3", **linode_obj_config)
+        client.upload_file(Filename=filepath, Bucket='DallE-Images', Key=filename)
+        os.remove(filepath)
+    except Exception as e:
+        print(e)
+
+
+def make_filename(title):
+    return title.replace(" ", "_") + "_" + str(datetime.utcnow()).replace(" ", "_") + ".png"
+
+
 def get_image_url(prompt):
     """Get the image from the prompt."""
     response = openai.Image.create(prompt=prompt, n=1, size="512x512")
@@ -388,6 +442,17 @@ def get_image_url(prompt):
 def render_picture(data):
     render_pic = base64.b64encode(data).decode('ascii')
     return render_pic
+
+
+def edit_image_ai(image, instructions):
+    response = openai.Image.create_edit(
+        image=image,
+        prompt=instructions,
+        n=1,
+        size="512x512"
+    )
+    image_url = response['data'][0]['url']
+    return image_url
 
 
 if __name__ == '__main__':
