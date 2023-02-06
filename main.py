@@ -51,7 +51,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 socketio = SocketIO(app)
-socketio = SocketIO(app, always_connect=True)
+#socketio = SocketIO(app, always_connect=True)
 
 linode_obj_config = {
     "aws_access_key_id": "JMUZU4LBJM1GITDW7ZII",
@@ -90,7 +90,6 @@ class FileContent(db.Model):
         return f'Pic Name: {self.title}, created on: {self.pic_date}'
 
 
-socketio = SocketIO(app, always_connect=True)
 #migrate = Migrate(app, db)
 
 # flask --app main.py db init
@@ -468,8 +467,4 @@ def handle_delete_event(json):
 
 
 if __name__ == '__main__':
-    try:
-        socketio.run(app, host='0.0.0.0', port='5000')
-    except RuntimeError as e:
-        print(e)
-        socketio.run(app, host='0.0.0.0', port='5000', allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', port='5000')
