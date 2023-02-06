@@ -50,8 +50,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-#socketio = SocketIO(app)
-socketio = SocketIO(app, always_connect=True)
+socketio = SocketIO(app)
+#socketio = SocketIO(app, always_connect=True)
 
 linode_obj_config = {
     "aws_access_key_id": "JMUZU4LBJM1GITDW7ZII",
