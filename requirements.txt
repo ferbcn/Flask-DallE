@@ -12,3 +12,5 @@ flask_login
 flask_migrate
 flask_socketio
 boto3
+gevent-websocket
+eventlet
