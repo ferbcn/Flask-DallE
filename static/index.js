@@ -1,5 +1,6 @@
 var waiting = false;
 var last_img_id = 0;
+var socket = io();
 
 function handleDelete(image_id){
 
@@ -14,7 +15,6 @@ window.onscroll = function() {
 
     if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight && !waiting) {
 
-        var socket = io();
         // var socket = io();
         // websockets send more images
         socket.emit('my_event', {data: last_img_id});
@@ -28,7 +28,6 @@ window.onscroll = function() {
     }
 }
 
-var socket = io();
 
 // load image feed
 socket.on('image feed', images => {

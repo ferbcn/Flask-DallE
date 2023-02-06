@@ -50,7 +50,17 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-socketio = SocketIO(app)
+#socketio = SocketIO(app)
+socketio = SocketIO(app, always_connect=True)
+
+linode_obj_config = {
+    "aws_access_key_id": "JMUZU4LBJM1GITDW7ZII",
+    "aws_secret_access_key": "bn0hxe2QhBIDi9WJue3T8p80IU3W2Cpt5hA9vaoM",
+    "endpoint_url": "https://art-intel.eu-central-1.linodeobjects.com",
+}
+
+client = boto3.client("s3", **linode_obj_config)
+
 
 class UserModel(UserMixin, db.Model):
     __tablename__ = 'art-users'
@@ -80,19 +90,7 @@ class FileContent(db.Model):
         return f'Pic Name: {self.title}, created on: {self.pic_date}'
 
 
-socketio = SocketIO(app, always_connect=True, engineio_logger=True)
-
-
-linode_obj_config = {
-    "aws_access_key_id": "JMUZU4LBJM1GITDW7ZII",
-    "aws_secret_access_key": "bn0hxe2QhBIDi9WJue3T8p80IU3W2Cpt5hA9vaoM",
-    "endpoint_url": "https://art-intel.eu-central-1.linodeobjects.com",
-}
-
-client = boto3.client("s3", **linode_obj_config)
-
-
-migrate = Migrate(app, db)
+#migrate = Migrate(app, db)
 
 # flask --app main.py db init
 # flask --app main.py db migrate
@@ -469,4 +467,4 @@ def handle_delete_event(json):
 
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port='5000')
+    socketio.run(app, host='0.0.0.0', port='5000', allow_unsafe_werkzeug=True)
