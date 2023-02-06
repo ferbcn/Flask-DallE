@@ -83,59 +83,6 @@ class FileContent(db.Model):
 socketio = SocketIO(app, always_connect=True, engineio_logger=True)
 
 
-@socketio.on('connect')
-def connected():
-    print('connect')
-
-
-@socketio.on('disconnect')
-def disconnect():
-    print('disconnect')
-
-
-@socketio.on('my_event')
-def handle_my_custom_event(json):
-    last_img_id = int(json["data"])
-    print("last img id:", last_img_id)
-    print(f"Loading more images...")
-    new_image_count = 5
-
-    # Hacky way for retrieving next images in db
-    images = []
-    found_img_count = 0
-    while (found_img_count < new_image_count):
-        # Iterate through DB: TODO: look-up sqlalchemy on this topic
-        last_img_id -= 1
-        if last_img_id <= 0:
-            break
-        #next_image = FileContent.query.get(last_img_id)
-        next_image = db.session.get(FileContent, last_img_id)
-        if next_image is not None:
-            images.append(next_image)
-            found_img_count += 1
-    # End of Hack
-
-    images_json_data = []
-    for image in images:
-        img = {"title": image.title, "data": image.rendered_data, "image_id": image.id}
-        images_json_data.append(img)
-
-    print("Sending images to web-socket!")
-    emit('image feed', images_json_data)
-
-
-@socketio.on('delete_event')
-def handle_delete_event(json):
-    image_id = json["data"]
-    print(f"Deleting image... {image_id}")
-    if current_user.is_authenticated:
-        FileContent.query.filter_by(id=image_id).delete()
-        db.session.commit()
-        flash(f"Image deleted!", 'success')
-    else:
-        print("Not logged in. Image not deleted.")
-
-
 linode_obj_config = {
     "aws_access_key_id": "JMUZU4LBJM1GITDW7ZII",
     "aws_secret_access_key": "bn0hxe2QhBIDi9WJue3T8p80IU3W2Cpt5hA9vaoM",
@@ -464,6 +411,61 @@ def edit_image_ai(image, instructions):
     )
     image_url = response['data'][0]['url']
     return image_url
+
+
+@socketio.on('connect')
+def connected():
+    print('connect')
+
+
+@socketio.on('disconnect')
+def disconnect():
+    print('disconnect')
+
+
+@socketio.on('my_event')
+def handle_my_custom_event(json):
+    last_img_id = int(json["data"])
+    print("last img id:", last_img_id)
+    print(f"Loading more images...")
+    new_image_count = 5
+
+    # Hacky way for retrieving next images in db
+    images = []
+    found_img_count = 0
+    while (found_img_count < new_image_count):
+        # Iterate through DB: TODO: look-up sqlalchemy on this topic
+        last_img_id -= 1
+        if last_img_id <= 0:
+            break
+        #next_image = FileContent.query.get(last_img_id)
+        next_image = db.session.get(FileContent, last_img_id)
+        if next_image is not None:
+            images.append(next_image)
+            found_img_count += 1
+    # End of Hack
+
+    images_json_data = []
+    for image in images:
+        img = {"title": image.title, "data": image.rendered_data, "image_id": image.id}
+        images_json_data.append(img)
+
+    print("Sending images to web-socket!")
+    emit('image feed', images_json_data)
+
+
+@socketio.on('delete_event')
+def handle_delete_event(json):
+    image_id = int(json["data"])
+    print(f"Deleting image... {image_id}")
+    if current_user.is_authenticated:
+        # FileContent.query.filter_by(id=image_id).delete()
+        item = db.session.get(FileContent, image_id)
+        db.session.delete(item)
+        db.session.commit()
+        flash(f"Image deleted!", 'success')
+    else:
+        print("Not logged in. Image not deleted.")
 
 
 if __name__ == '__main__':
