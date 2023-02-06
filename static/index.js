@@ -1,5 +1,6 @@
 var waiting = false;
 var last_img_id = 0;
+
 var socket = io();
 
 function handleDelete(image_id){
@@ -15,7 +16,7 @@ window.onscroll = function() {
 
     if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight && !waiting) {
 
-        // var socket = io();
+        //var socket = io();
         // websockets send more images
         socket.emit('my_event', {data: last_img_id});
         waiting = true;
@@ -27,7 +28,6 @@ window.onscroll = function() {
 
     }
 }
-
 
 // load image feed
 socket.on('image feed', images => {
@@ -76,11 +76,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
     */
 
     // remove "zombie" child from image list
-    const list = document.getElementById("image_child");
-    list.removeChild(list.lastChild);
+    //const list = document.getElementById("image_child");
+    //list.removeChild(list.lastChild);
     // and get teh id of last image in list
-    last_img_id = document.getElementById("image_child").lastChild.id;
-
-
+    //last_img_id = document.getElementById("image_child").lastChild.id;
+    last_img_id = document.getElementById("image_child").lastChild.previousSibling.id;
 });
 
